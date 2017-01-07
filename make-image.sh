@@ -85,7 +85,7 @@ mkimage -C none -A arm -T script -d "$BOOTCMD" "$TMPDIR/boot.scr"
 
 # Add config and self
 mkdir -p "$TMPDIR/mnt"
-umount "$TMPDIR/mnt" || true
+umount "$TMPDIR/mnt" 2> /dev/null || true
 mount -o loop "$TMPDIR/partition.img" "$TMPDIR/mnt"
 cp "$TMPDIR/boot.scr" "$TMPDIR/mnt/boot.scr"
 cp "$0" "$TMPDIR/mnt/make-image.sh"
