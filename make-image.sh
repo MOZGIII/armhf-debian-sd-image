@@ -2,7 +2,7 @@
 set -e
 
 if [[ -z "$1" ]]; then
-  echo >&2 "Usage: $0 image_name"
+  echo >&2 "Usage: $0 image_name [boot.cmd]"
   echo >&2 ""
   echo >&2 "Examples:"
   echo >&2 "  $0 firmware.Cubietruck.img"
@@ -12,6 +12,7 @@ if [[ -z "$1" ]]; then
   exit 1
 fi
 IMAGE_NAME="$1"
+BOOTCMD="$2"
 TMPDIR="tmp"
 mkdir -p "$TMPDIR/source"
 load-debian-source() {
@@ -27,15 +28,16 @@ zcat "$TMPDIR/source/$IMAGE_NAME.gz" > "$TMPDIR/$IMAGE_NAME"
 zcat "$TMPDIR/source/partition.img.gz" > "$TMPDIR/partition.img"
 
 # Config
-if [[ "$TTY1CONSOLE" == "true" ]]; then
-  CONSOLEBLOCK='setenv console tty1
+if [[ -z "$BOOTCMD" ]]; then
+  if [[ "$TTY1CONSOLE" == "true" ]]; then
+    CONSOLEBLOCK='setenv console tty1
 setenv bootargs fb=false'
-else
-  CONSOLEBLOCK=''
-fi
+  else
+    CONSOLEBLOCK=''
+  fi
 
-
-cat > "$TMPDIR/boot.cmd" <<-TEXT
+  BOOTCMD="$TMPDIR/boot.cmd"
+  cat > "$BOOTCMD" <<-TEXT
 # Bootscript using the new unified bootcmd handling
 # introduced with u-boot v2014.10
 
@@ -77,7 +79,9 @@ load \${devtype} \${devnum}:\${bootpart} \${kernel_addr_r} vmlinuz \
 && echo "Booting the Debian installer..." \
 && bootz \${kernel_addr_r} \${ramdisk_addr_r}:\${filesize} \${fdt_addr_r}
 TEXT
-mkimage -C none -A arm -T script -d "$TMPDIR/boot.cmd" "$TMPDIR/boot.scr"
+fi
+echo "Calling mkimage on $BOOTCMD:"
+mkimage -C none -A arm -T script -d "$BOOTCMD" "$TMPDIR/boot.scr"
 
 # Add config and self
 mkdir -p "$TMPDIR/mnt"
