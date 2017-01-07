@@ -88,6 +88,7 @@ mkdir -p "$TMPDIR/mnt"
 umount "$TMPDIR/mnt" 2> /dev/null || true
 mount -o loop "$TMPDIR/partition.img" "$TMPDIR/mnt"
 cp "$TMPDIR/boot.scr" "$TMPDIR/mnt/boot.scr"
+cp "$BOOTCMD" "$TMPDIR/mnt/boot.cmd"
 cp "$0" "$TMPDIR/mnt/make-image.sh"
 sync
 umount "$TMPDIR/mnt"
