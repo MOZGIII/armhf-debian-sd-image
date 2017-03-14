@@ -17,7 +17,7 @@ TMPDIR="tmp"
 mkdir -p "$TMPDIR/source"
 load-debian-source() {
   if [[ ! -f "$TMPDIR/source/$1" ]]; then
-    wget "-O$TMPDIR/source/$1" "https://d-i.debian.org/daily-images/armhf/daily/netboot/SD-card-images/$1"
+    wget "-O$TMPDIR/source/$1" "http://ftp.ru.debian.org/debian/dists/jessie/main/installer-armhf/current/images/netboot/SD-card-images/$1"
   fi
 }
 load-debian-source "$IMAGE_NAME.gz"
